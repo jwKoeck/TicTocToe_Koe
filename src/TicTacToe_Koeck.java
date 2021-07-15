@@ -7,42 +7,37 @@ public class TicTacToe_Koeck {
     static final char empty = ' ';
 
     public static void main(String[] args) {
-        final char player1 = X;
-        final char player2 = O;
-        final boolean player1Human = true;
-        final boolean player2Human = false;
+
+        final Player player1 = new Player("Human", X, true);
+        final Player player2 = new Player("Computer", O, false);
 
         final char[][] field = new char[3][3];
         initalizeField(field);
         int countEmpty = field.length * field[0].length;
-        boolean gameOver = false;
-        char nextPlayer = player1;
-        boolean nextPlayerHuman = player1Human;
-        char winner = empty;
+        Player nextPlayer = player1;
+        Player winner = null;
 
-        while (countEmpty > 0 && ! gameOver) {
+        while (countEmpty > 0 && winner == null ) {
             printField(field);
 
-            System.out.println("Next move of player " + nextPlayer);
+            System.out.println("Next move of player " + nextPlayer.getName());
 
-            if (nextPlayerHuman) {
+            if (nextPlayer.isHuman()) {
                 moveHumanPlayer(field, nextPlayer);
             } else {
                 moveComputerPlayer(field, nextPlayer);
             }
 
-            winner = whoWins(field);
-            if ( winner!= empty) {
-                System.out.println(winner + " wins! Congratulations!");
-                gameOver = true;
+            winner = whoWins(field, player1, player2);
+            if ( winner != null) {
+                System.out.println(winner.getName() + " wins! Congratulations!");
             } else {
                 // swap player
                 nextPlayer = (nextPlayer == player1) ? player2 : player1;
-                nextPlayerHuman = (nextPlayer == player1) ? player1Human : player2Human;
             }
         }
 
-        if (!gameOver) {
+        if (winner == null) {
             System.out.println("Draw! No winner!");
         }
         // final print
@@ -70,7 +65,7 @@ public class TicTacToe_Koeck {
         System.out.println("-".repeat(field.length * 4 + 1));
     }
 
-    public static void moveHumanPlayer(char[][] field, char player){
+    public static void moveHumanPlayer(char[][] field, Player player){
         Scanner scanner = new Scanner(System.in);
         boolean validMove = false;
 
@@ -80,13 +75,13 @@ public class TicTacToe_Koeck {
             System.out.print("Column: ");
             int column = scanner.nextInt() - 1; // correct to zero-based index
             if (row < field.length && column < field[row].length && field[row][column] == empty) {
-                field[row][column] = player;
+                field[row][column] = player.getFigure();
                 validMove = true;
             }
         }
     }
 
-    public static void moveComputerPlayer(char[][] field, char player) {
+    public static void moveComputerPlayer(char[][] field, Player player) {
         int strategie = 0;
         int cell = 0;
 
@@ -98,7 +93,7 @@ public class TicTacToe_Koeck {
                 cell = getField_RandomStrategie(field);
         }
 
-        field[getRow(field, cell)][getColumn(field, cell)] = player;
+        field[getRow(field, cell)][getColumn(field, cell)] = player.getFigure();
     }
 
     public static int getField_RandomStrategie(char[][] field) {
@@ -120,11 +115,12 @@ public class TicTacToe_Koeck {
         return cell % field[0].length;
     }
 
-    public static char whoWins(char[][] field) {
+    public static Player whoWins(char[][] field, Player player1, Player player2) {
         char winsRow = empty;
         char winsColumn = empty;
         char winsXDown = empty;
         char winsXUp = empty;
+        char winner = empty;
 
         for (int i = 0; i < field.length; i++) {
             winsRow = field[i][0];
@@ -137,11 +133,27 @@ public class TicTacToe_Koeck {
                 if (field[j][j] != winsXDown) winsXDown = empty;
                 if (field[field.length-1-j][j] != winsXUp) winsXUp = empty;
             }
-            if (winsRow != empty) return winsRow;
-            if (winsColumn != empty) return winsColumn;
-            if (winsXDown != empty) return winsXDown;
-            if (winsXUp != empty) return winsXUp;
+            if (winsRow != empty) {
+                winner = winsRow;
+                break;
+            } else if (winsColumn != empty) {
+                winner = winsColumn;
+                break;
+            } else if (winsXDown != empty) {
+                winner = winsXDown;
+                break;
+            } else if (winsXUp != empty) {
+                winner = winsXUp;
+                break;
+            }
         }
-        return empty;
+        if (winner == empty) {
+            return null;
+        } else if (winner == player1.getFigure()) {
+            return player1;
+        } else {
+            return player2;
+        }
+
     }
 }
