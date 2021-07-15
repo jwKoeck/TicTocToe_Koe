@@ -8,13 +8,14 @@ public class TicTacToe_Koeck {
 
     public static void main(String[] args) {
 
-        final Player player1 = new Player("Human", X, false);
+        final Player player1 = new Player("Human", X, true);
         final Player player2 = new Player("Computer", O, false);
 
         final char[][] field = new char[3][3];
         initalizeField(field);
         int countEmpty = field.length * field[0].length;
         Player nextPlayer = player1;
+        Player otherPlayer = player2;
         Player winner = null;
 
         while (countEmpty > 0 && winner == null ) {
@@ -25,7 +26,7 @@ public class TicTacToe_Koeck {
             if (nextPlayer.isHuman()) {
                 moveHumanPlayer(field, nextPlayer);
             } else {
-                moveComputerPlayer(field, nextPlayer);
+                moveComputerPlayer(field, nextPlayer, otherPlayer);
             }
             countEmpty--;
 
@@ -35,6 +36,7 @@ public class TicTacToe_Koeck {
             } else {
                 // swap player
                 nextPlayer = (nextPlayer == player1) ? player2 : player1;
+                otherPlayer = (nextPlayer == player1) ? player2 : player1;
             }
         }
 
@@ -82,22 +84,25 @@ public class TicTacToe_Koeck {
         }
     }
 
-    public static void moveComputerPlayer(char[][] field, Player player) {
+    public static void moveComputerPlayer(char[][] field, Player me, Player other) {
         int strategy = 1;
-        int cell = 0;
+        int cell = -1;
 
         switch (strategy){
             case 0: // random move
                 cell = getField_RandomStrategy(field);
                 break;
             case 1:
-                cell = getField_MakeWinMoveStrategy(field,player);
+                cell = getField_MakeWinMoveStrategy(field,me);
+                if (cell == -1) {
+                    cell = getField_RandomStrategy(field);
+                }
                 break;
             default:
                 cell = getField_RandomStrategy(field);
         }
 
-        field[getRow(field, cell)][getColumn(field, cell)] = player.getFigure();
+        field[getRow(field, cell)][getColumn(field, cell)] = me.getFigure();
     }
 
     public static int getField_RandomStrategy(char[][] field) {
@@ -128,7 +133,7 @@ public class TicTacToe_Koeck {
                 }
             }
         }
-        return getField_RandomStrategy(field);
+        return -1;
     }
 
     public static char[][] simulateMove(char[][] field, Player player, int cell) {
