@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class TicTacToe_Koeck {
@@ -8,17 +9,27 @@ public class TicTacToe_Koeck {
     public static void main(String[] args) {
         final char player1 = X;
         final char player2 = O;
+        final boolean player1Human = true;
+        final boolean player2Human = false;
 
         final char[][] field = new char[3][3];
         initalizeField(field);
         int countEmpty = field.length * field[0].length;
         boolean gameOver = false;
         char nextPlayer = player1;
+        boolean nextPlayerHuman = player1Human;
         char winner = empty;
 
         while (countEmpty > 0 && ! gameOver) {
             printField(field);
-            moveHumanPlayer(field, nextPlayer);
+
+            System.out.println("Next move of player " + nextPlayer);
+
+            if (nextPlayerHuman) {
+                moveHumanPlayer(field, nextPlayer);
+            } else {
+                moveComputerPlayer(field, nextPlayer);
+            }
 
             winner = whoWins(field);
             if ( winner!= empty) {
@@ -27,6 +38,7 @@ public class TicTacToe_Koeck {
             } else {
                 // swap player
                 nextPlayer = (nextPlayer == player1) ? player2 : player1;
+                nextPlayerHuman = (nextPlayer == player1) ? player1Human : player2Human;
             }
         }
 
@@ -62,8 +74,6 @@ public class TicTacToe_Koeck {
         Scanner scanner = new Scanner(System.in);
         boolean validMove = false;
 
-        System.out.println("Next move of player " + player);
-
         while (!validMove) {
             System.out.print("Row: ");
             int row = scanner.nextInt() - 1; // correct to zero-based index
@@ -74,6 +84,40 @@ public class TicTacToe_Koeck {
                 validMove = true;
             }
         }
+    }
+
+    public static void moveComputerPlayer(char[][] field, char player) {
+        int strategie = 0;
+        int cell = 0;
+
+        switch (strategie){
+            case 0: // random move
+                cell = getField_RandomStrategie(field);
+                break;
+            default:
+                cell = getField_RandomStrategie(field);
+        }
+
+        field[getRow(field, cell)][getColumn(field, cell)] = player;
+    }
+
+    public static int getField_RandomStrategie(char[][] field) {
+        Random rand = new Random();
+
+        int cell = 0;
+
+        do {
+            cell = rand.nextInt(field.length * field[0].length);
+        } while (field[getRow(field, cell)][getColumn(field, cell)] != empty);
+        return cell;
+    }
+
+    public static int getRow(char[][] field, int cell) {
+        return cell / field[0].length;
+    }
+
+    public static int getColumn(char[][] field, int cell) {
+        return cell % field[0].length;
     }
 
     public static char whoWins(char[][] field) {
