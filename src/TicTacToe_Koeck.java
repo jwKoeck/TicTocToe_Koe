@@ -8,7 +8,7 @@ public class TicTacToe_Koeck {
 
     public static void main(String[] args) {
 
-        final Player player1 = new Player("Human", X, true);
+        final Player player1 = new Player("Human", X, false);
         final Player player2 = new Player("Computer", O, false);
 
         final char[][] field = new char[3][3];
@@ -27,6 +27,7 @@ public class TicTacToe_Koeck {
             } else {
                 moveComputerPlayer(field, nextPlayer);
             }
+            countEmpty--;
 
             winner = whoWins(field, player1, player2);
             if ( winner != null) {
@@ -82,21 +83,24 @@ public class TicTacToe_Koeck {
     }
 
     public static void moveComputerPlayer(char[][] field, Player player) {
-        int strategie = 0;
+        int strategy = 1;
         int cell = 0;
 
-        switch (strategie){
+        switch (strategy){
             case 0: // random move
-                cell = getField_RandomStrategie(field);
+                cell = getField_RandomStrategy(field);
+                break;
+            case 1:
+                cell = getField_MakeWinMoveStrategy(field,player);
                 break;
             default:
-                cell = getField_RandomStrategie(field);
+                cell = getField_RandomStrategy(field);
         }
 
         field[getRow(field, cell)][getColumn(field, cell)] = player.getFigure();
     }
 
-    public static int getField_RandomStrategie(char[][] field) {
+    public static int getField_RandomStrategy(char[][] field) {
         Random rand = new Random();
 
         int cell = 0;
@@ -105,6 +109,37 @@ public class TicTacToe_Koeck {
             cell = rand.nextInt(field.length * field[0].length);
         } while (field[getRow(field, cell)][getColumn(field, cell)] != empty);
         return cell;
+    }
+
+    public static int getField_MakeWinMoveStrategy(char[][] field, Player player) {
+        for (int i = 0; i < field.length * field[0].length; i++) {
+            int row = getRow(field, i);
+            int column = getColumn(field, i);
+            if (field[row][column] == empty) {
+                // test for a winning move
+                char[][] simulation = simulateMove(field, player, i);
+
+//                System.out.println("Simulation " + i);
+//                printField(simulation);
+//                System.out.println("Winner " + whoWins(simulation, player, player));
+
+                if (whoWins(simulation, player, player) == player) {
+                    return i;
+                }
+            }
+        }
+        return getField_RandomStrategy(field);
+    }
+
+    public static char[][] simulateMove(char[][] field, Player player, int cell) {
+        // copy field to simulation-field
+        char[][] simulation = new char[field.length][];
+        for (int i = 0; i < field.length; i++) {
+            simulation[i] = field[i].clone();
+        }
+        // perform move in simulation and return it
+        simulation[getRow(field, cell)][getColumn(field, cell)] = player.getFigure();
+        return simulation;
     }
 
     public static int getRow(char[][] field, int cell) {
