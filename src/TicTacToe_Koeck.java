@@ -14,14 +14,27 @@ public class TicTacToe_Koeck {
         int countEmpty = field.length * field[0].length;
         boolean gameOver = false;
         char nextPlayer = player1;
+        char winner = empty;
 
         while (countEmpty > 0 && ! gameOver) {
             printField(field);
             moveHumanPlayer(field, nextPlayer);
 
-            // swap player
-            nextPlayer = (nextPlayer == player1) ? player2 : player1;
+            winner = whoWins(field);
+            if ( winner!= empty) {
+                System.out.println(winner + " wins! Congratulations!");
+                gameOver = true;
+            } else {
+                // swap player
+                nextPlayer = (nextPlayer == player1) ? player2 : player1;
+            }
         }
+
+        if (!gameOver) {
+            System.out.println("Draw! No winner!");
+        }
+        // final print
+        printField(field);
     }
 
     public static void initalizeField (char[][] field){
@@ -61,5 +74,30 @@ public class TicTacToe_Koeck {
                 validMove = true;
             }
         }
+    }
+
+    public static char whoWins(char[][] field) {
+        char winsRow = empty;
+        char winsColumn = empty;
+        char winsXDown = empty;
+        char winsXUp = empty;
+
+        for (int i = 0; i < field.length; i++) {
+            winsRow = field[i][0];
+            winsColumn = field[0][i];
+            winsXDown = field[0][0];
+            winsXUp = field[field.length-1][0];
+            for (int j = 1; j < field.length; j++) {
+                if (field[i][j] != winsRow) winsRow = empty;
+                if (field[j][i] != winsColumn) winsColumn = empty;
+                if (field[j][j] != winsXDown) winsXDown = empty;
+                if (field[field.length-1-j][j] != winsXUp) winsXUp = empty;
+            }
+            if (winsRow != empty) return winsRow;
+            if (winsColumn != empty) return winsColumn;
+            if (winsXDown != empty) return winsXDown;
+            if (winsXUp != empty) return winsXUp;
+        }
+        return empty;
     }
 }
