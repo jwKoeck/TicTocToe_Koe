@@ -1,4 +1,6 @@
 class Player {
+    // Comment
+
     private String name;
     private char figure;
     private boolean isHuman;
