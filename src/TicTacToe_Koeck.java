@@ -2,6 +2,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class TicTacToe_Koeck {
+    // define stones
     static final char X = 'X';
     static final char O = 'O';
     static final char empty = ' ';

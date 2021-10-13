@@ -1,5 +1,6 @@
 class Player {
     // Comment
+    // Comment 2
 
     private String name;
     private char figure;
